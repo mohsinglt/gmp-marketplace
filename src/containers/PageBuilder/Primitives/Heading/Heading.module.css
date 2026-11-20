@@ -11,7 +11,8 @@
   margin-bottom: 0;
   line-height: 1.33;
   font-weight: bold;
-  color: var(--colorGrey900);
+  color: var(--colorHeading);
+  font-family: var(--fontFamilyHeading);
 
   /* fallback option */
   word-break: break-all;
