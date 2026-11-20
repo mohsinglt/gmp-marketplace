@@ -7,7 +7,7 @@ services:
     runtime: node
     plan: free
     branch: gmp/home-page
-    buildCommand: yarn install --frozen-lockfile --ignore-engines && yarn build
+    buildCommand: yarn install --frozen-lockfile --ignore-engines --production=false && yarn build
     startCommand: yarn start
     healthCheckPath: /
     envVars:
