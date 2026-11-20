@@ -94,14 +94,14 @@
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0;
-  color: var(--colorGrey700);
+  color: var(--colorGrey800);
 
   height: 100%;
   padding: 0 12px 0 12px;
   margin: 0;
 
   &:hover {
-    color: var(--colorBlack);
+    color: var(--gmpNavy);
     border-bottom: 4px solid var(--marketplaceColor);
     border-radius: 0;
     text-decoration: none;
@@ -110,6 +110,30 @@
   @media (--viewportMedium) {
     line-height: 16px;
     margin: 0;
+  }
+}
+
+/* Global Marketplace: sign up is a filled teal button, as in the prototype */
+.signupButton {
+  flex-shrink: 0;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 20px;
+  margin: 0 0 0 12px;
+  border-radius: 10px;
+  background-color: var(--colorPrimaryButton, var(--gmpTeal));
+  color: var(--colorWhite);
+  font-weight: var(--fontWeightSemiBold);
+  font-size: 14px;
+  line-height: 16px;
+  transition: var(--transitionStyleButton);
+
+  &:hover {
+    background-color: var(--colorPrimaryButtonDark, var(--gmpNavy));
+    color: var(--colorWhite);
+    text-decoration: none;
   }
 }
 
