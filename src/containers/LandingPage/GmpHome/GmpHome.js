@@ -12,12 +12,12 @@ import css from './GmpHome.module.css';
 // Global Marketplace home page. Copy lives in src/translations/en.json under "GmpHome.*",
 // so it can be edited from Console > Marketplace texts without a code change.
 
-const AGENCY_SEARCH = '/s/agency-services';
-const serviceSearch = key => `${AGENCY_SEARCH}?pub_services=has_all%3A${key}`;
+export const AGENCY_SEARCH = '/s/agency-services';
+export const serviceSearch = key => `${AGENCY_SEARCH}?pub_services=has_all%3A${key}`;
 
 // Order and icons for the ten service categories. Labels come from the hosted listing field
 // "services" when available, with these as fallbacks.
-const CATEGORIES = [
+export const CATEGORIES = [
   { key: 'web_software_apps', label: 'Web & software', icon: 'M3 4h18v12H3zM8 20h8M12 16v4' },
   {
     key: 'ai_automation',
@@ -54,7 +54,7 @@ const CATEGORIES = [
   },
 ];
 
-const COUNTRY_LABELS = {
+export const COUNTRY_LABELS = {
   pakistan: 'Pakistan',
   india: 'India',
   united_kingdom: 'United Kingdom',
@@ -62,7 +62,7 @@ const COUNTRY_LABELS = {
   canada: 'Canada',
 };
 
-const Icon = ({ path, className, size = 22 }) => (
+export const Icon = ({ path, className, size = 22 }) => (
   <svg
     className={className}
     aria-hidden="true"
@@ -79,7 +79,7 @@ const Icon = ({ path, className, size = 22 }) => (
   </svg>
 );
 
-const ShieldIcon = ({ className, size = 15 }) => (
+export const ShieldIcon = ({ className, size = 15 }) => (
   <svg className={className} aria-hidden="true" width={size} height={size} viewBox="0 0 24 24">
     <path fill="currentColor" d="M12 2 4 5v7c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V5l-8-3z" />
     <path
