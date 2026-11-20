@@ -7,12 +7,12 @@ services:
     runtime: node
     plan: free
     branch: gmp/home-page
-    buildCommand: yarn install --frozen-lockfile && yarn build
+    buildCommand: yarn install --frozen-lockfile --ignore-engines && yarn build
     startCommand: yarn start
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
-        value: 24.22.3
+        value: '24'
       - key: NODE_ENV
         value: production
       - key: REACT_APP_ENV
