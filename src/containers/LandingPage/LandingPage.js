@@ -1,34 +1,71 @@
 import React from 'react';
-import loadable from '@loadable/component';
 
-import { bool, object } from 'prop-types';
+import { bool, object, array } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 
 import { camelize } from '../../util/string';
 import { propTypes } from '../../util/types';
+import { getListingsById } from '../../ducks/marketplaceData.duck';
+
+import { LayoutComposer, StaticPage } from '../PageBuilder/PageBuilder';
+import { validProps } from '../PageBuilder/Field';
+import TopbarContainer from '../TopbarContainer/TopbarContainer';
+import FooterContainer from '../FooterContainer/FooterContainer';
 
 import FallbackPage from './FallbackPage';
+import GmpHome from './GmpHome/GmpHome';
 import { ASSET_NAME } from './LandingPage.duck';
-import { fetchFeaturedListings } from '../../ducks/featuredListings.duck';
-import { getListingsById } from '../../ducks/marketplaceData.duck';
-import { getFeaturedListingsProps } from '../../util/data';
 
-const PageBuilder = loadable(() =>
-  import(/* webpackChunkName: "PageBuilder" */ '../PageBuilder/PageBuilder')
-);
+// SEO title and description still come from Console > Pages > landing-page > SEO & Social.
+const getMeta = pageData => {
+  const { pageTitle, pageDescription, socialSharing } = pageData?.meta || {};
+  return {
+    title: validProps(pageTitle)?.content,
+    description: validProps(pageDescription)?.content,
+    socialSharing: validProps(socialSharing),
+  };
+};
 
+/**
+ * Global Marketplace landing page. The content is a coded design (GmpHome) instead of
+ * Console page sections, so it can match the approved prototype exactly.
+ */
 export const LandingPageComponent = props => {
-  const { pageAssetsData, inProgress, error } = props;
+  const { pageAssetsData, inProgress, error, agencyListings } = props;
+  const pageData = pageAssetsData?.[camelize(ASSET_NAME)]?.data;
+
+  if (!pageData && !inProgress && error) {
+    return <FallbackPage error={error} />;
+  }
+
+  const layoutAreas = `
+    topbar
+    main
+    footer
+  `;
 
   return (
-    <PageBuilder
-      pageAssetsData={pageAssetsData?.[camelize(ASSET_NAME)]?.data}
-      inProgress={inProgress}
-      error={error}
-      fallbackPage={<FallbackPage error={error} />}
-      featuredListings={getFeaturedListingsProps(camelize(ASSET_NAME), props)}
-    />
+    <StaticPage {...getMeta(pageData)}>
+      <LayoutComposer areas={layoutAreas}>
+        {layoutProps => {
+          const { Topbar, Main, Footer } = layoutProps;
+          return (
+            <>
+              <Topbar as="header">
+                <TopbarContainer currentPage="LandingPage" />
+              </Topbar>
+              <Main as="main" id="main-content">
+                <GmpHome agencyListings={agencyListings} />
+              </Main>
+              <Footer>
+                <FooterContainer />
+              </Footer>
+            </>
+          );
+        }}
+      </LayoutComposer>
+    </StaticPage>
   );
 };
 
@@ -36,33 +73,16 @@ LandingPageComponent.propTypes = {
   pageAssetsData: object,
   inProgress: bool,
   error: propTypes.error,
+  agencyListings: array,
 };
 
 const mapStateToProps = state => {
   const { pageAssetsData, inProgress, error } = state.hostedAssets || {};
-  const featuredListingData = state.featuredListings || {};
-
-  const getListingEntitiesById = listingIds => getListingsById(state, listingIds);
-
-  return { pageAssetsData, featuredListingData, getListingEntitiesById, inProgress, error };
+  const { agencyIds = [] } = state.LandingPage || {};
+  const agencyListings = getListingsById(state, agencyIds);
+  return { pageAssetsData, inProgress, error, agencyListings };
 };
 
-const mapDispatchToProps = dispatch => ({
-  onFetchFeaturedListings: (sectionId, parentPage, listingImageConfig, allSections) =>
-    dispatch(fetchFeaturedListings({ sectionId, parentPage, listingImageConfig, allSections })),
-});
-
-// Note: it is important that the withRouter HOC is **outside** the
-// connect HOC, otherwise React Router won't rerender any Route
-// components since connect implements a shouldComponentUpdate
-// lifecycle hook.
-//
-// See: https://github.com/ReactTraining/react-router/issues/4671
-const LandingPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(LandingPageComponent);
+const LandingPage = compose(connect(mapStateToProps))(LandingPageComponent);
 
 export default LandingPage;

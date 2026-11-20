@@ -1,0 +1,53 @@
+.titleLink {
+  color: inherit;
+
+  &:hover {
+    color: var(--gmpTeal);
+    text-decoration: none;
+  }
+}
+
+.projectBy {
+  margin: -8px 0 0;
+  padding: 0;
+  font-size: 14px;
+  color: #5b6b80;
+}
+
+.chipTeal {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background-color: var(--gmpTealTint);
+  color: #1e6457;
+}
+
+/* Results grid for the coded GMP cards (wider than the template's image cards) */
+.gmpCards {
+  padding: 0 0 72px 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+
+  @media (min-width: 700px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.gmpCardItem {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+
+  & > article {
+    flex: 1;
+  }
+}
