@@ -1,0 +1,36 @@
+# Render Blueprint for the Global Marketplace review site (Sharetribe Dev environment).
+# Render > New > Blueprint > pick this repository. Values marked "sync: false" are
+# entered by you in the Render dashboard and are never stored in this repository.
+services:
+  - type: web
+    name: gmp-marketplace-dev
+    runtime: node
+    plan: free
+    branch: gmp/home-page
+    buildCommand: yarn install --frozen-lockfile && yarn build
+    startCommand: yarn start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24.22.3
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_ENV
+        value: production
+      - key: REACT_APP_MARKETPLACE_NAME
+        value: Global Marketplace
+      - key: REACT_APP_SHARETRIBE_SDK_CLIENT_ID
+        value: 3e56e06a-0cac-4f29-a642-ff5a664f6614
+      - key: REACT_APP_SHARETRIBE_USING_SSL
+        value: 'true'
+      - key: SERVER_SHARETRIBE_TRUST_PROXY
+        value: 'true'
+      - key: REACT_APP_CSP
+        value: report
+      # Entered in the Render dashboard:
+      - key: SHARETRIBE_SDK_CLIENT_SECRET
+        sync: false
+      - key: REACT_APP_MAPBOX_ACCESS_TOKEN
+        sync: false
+      - key: REACT_APP_MARKETPLACE_ROOT_URL
+        sync: false
