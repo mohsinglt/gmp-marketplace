@@ -24,47 +24,48 @@ describe('LandingPage', () => {
     });
   });
 
-  it('renders given pageAssetsData', async () => {
-    const data = {
-      sections: [
-        {
-          sectionType: 'columns',
-          sectionId: 'test-section',
-          numColumns: 1,
-          title: { fieldType: 'heading2', content: 'Landing page' },
-          description: {
-            fieldType: 'paragraph',
-            content: 'This is the description of the section',
-          },
-          blocks: [
-            {
-              blockType: 'defaultBlock',
-              blockId: 'test-block',
-              title: { fieldType: 'heading3', content: 'Block title here' },
-              text: {
-                fieldType: 'markdown',
-                content: `**Lorem ipsum** dolor sit amet, consectetur adipiscing elit. Nulla orci nisi, lobortis sit amet posuere et, vulputate sit amet neque. Nam a est id lectus viverra sagittis. Proin sed imperdiet lorem. Duis aliquam fermentum purus, tincidunt venenatis felis gravida in. Sed imperdiet mi vitae consequat rhoncus. Sed velit leo, porta at lorem ac, iaculis fermentum leo. Morbi tellus orci, bibendum id ante vel, hendrerit efficitur lectus. Proin vitae condimentum justo. Phasellus finibus nisi quis neque feugiat, ac auctor ipsum suscipit.`,
-              },
-            },
-          ],
+  it('renders the GMP home page with agency cards', async () => {
+    const agency = {
+      id: { uuid: 'agency-1' },
+      type: 'listing',
+      attributes: {
+        title: 'CalibreOn International: Accounting',
+        description: 'Bookkeeping on QuickBooks and Xero for international clients.',
+        deleted: false,
+        publicData: {
+          listingType: 'agency-services',
+          services: ['accounting'],
+          years_operating: 13,
         },
-      ],
+      },
+      author: {
+        id: { uuid: 'user-1' },
+        type: 'user',
+        attributes: {
+          profile: {
+            displayName: 'CalibreOn International',
+            abbreviatedName: 'CI',
+            publicData: { city: 'Gilgit', country: 'pakistan' },
+          },
+        },
+      },
     };
 
-    const { getByText } = render(
+    const { getByText, getAllByText } = render(
       <LandingPageComponent
-        pageAssetsData={{ landingPage: { data } }}
+        pageAssetsData={{ landingPage: { data: { sections: [] } } }}
         inProgress={false}
         error={null}
+        agencyListings={[agency]}
       />
     );
 
     await waitFor(() => {
-      // Expect following texts to be found from rendered UI (inside <body>)
-      expect(getByText('Landing page')).toBeInTheDocument();
-      expect(getByText('This is the description of the section')).toBeInTheDocument();
-      expect(getByText('Block title here')).toBeInTheDocument();
-      expect(getByText('Lorem ipsum')).toBeInTheDocument();
+      expect(getByText('GmpHome.categoriesTitle')).toBeInTheDocument();
+      expect(getByText('GmpHome.featuredTitle')).toBeInTheDocument();
+      expect(getAllByText('CalibreOn International').length).toBeGreaterThan(0);
+      expect(getAllByText('Gilgit, Pakistan').length).toBeGreaterThan(0);
+      expect(getByText('GmpHome.modelsTitle')).toBeInTheDocument();
     });
   });
 });
