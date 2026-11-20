@@ -83,8 +83,20 @@
   --colorStatusFinalState: var(--colorGrey600);
 
   /* ================ Font ================ */
-  --fontFamily: -apple-system, BlinkMacSystemFont, 'Inter', Helvetica, Arial, sans-serif,
+  --fontFamily: 'Inter', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+  /* Global Marketplace: headings use Poppins (loaded in public/index.html) */
+  --fontFamilyHeading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, Helvetica, Arial,
+    sans-serif;
+
+  /* ================ Global Marketplace brand ================ */
+  --gmpNavy: #13305e;
+  --gmpNavyDark: #0e2445;
+  --gmpTeal: #2f7f72;
+  --gmpTealLight: #7fd1c2;
+  --gmpTealTint: #e6f4f1;
+  --colorHeading: var(--gmpNavy);
 
   --fontWeightRegular: 400;
   --fontWeightMedium: 500;
@@ -267,6 +279,8 @@ a:hover {
 }
 
 h1 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-size: 24px;
   line-height: 24px;
   font-weight: var(--fontWeightBlack);
@@ -286,6 +300,8 @@ h1 {
 }
 
 h2 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-size: 21px;
   line-height: 24px;
   font-weight: var(--fontWeightBold);
@@ -306,6 +322,8 @@ h2 {
 }
 
 h3 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-weight: var(--fontWeightBold);
   font-size: 18px;
   line-height: 24px;
@@ -626,6 +644,8 @@ textarea {
 }
 
 .h1 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-weight: var(--fontWeightBlack);
   font-size: 24px;
   line-height: 24px;
@@ -646,6 +666,8 @@ textarea {
 }
 
 .h2 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-weight: var(--fontWeightBold);
   font-size: 21px;
   line-height: 24px;
@@ -666,6 +688,8 @@ textarea {
 }
 
 .h3 {
+  font-family: var(--fontFamilyHeading);
+  color: var(--colorHeading);
   font-weight: var(--fontWeightBold);
   font-size: 18px;
   line-height: 24px;

@@ -1,7 +1,22 @@
 @import '../../../../styles/customMediaQueries.css';
 
 .root {
-  border-top: 1px solid var(--colorGrey100);
+  /* Global Marketplace: soft brand-tinted footer with a teal accent line */
+  border-top: 3px solid var(--gmpTeal);
+  background-color: #f1f4f8;
+}
+
+.footer a {
+  color: var(--colorGrey800);
+
+  &:hover {
+    color: var(--gmpNavy);
+  }
+}
+
+.footer strong {
+  color: var(--gmpNavy);
+  font-family: var(--fontFamilyHeading);
 }
 
 .footer {
