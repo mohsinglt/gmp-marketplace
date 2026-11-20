@@ -124,10 +124,8 @@ describe('SignupForm', () => {
     );
 
     // Simulate user interaction and select parent level category
-    await user.selectOptions(
-      screen.getByRole('combobox'),
-      screen.getByRole('option', { name: 'Seller' })
-    );
+    // GMP: user type is picked from radio cards
+    await user.click(screen.getByRole('radio', { name: 'Seller' }));
 
     // Test that sign up button is disabled at first
     expect(screen.getByRole('button', { name: 'SignupForm.signUp' })).toBeDisabled();
@@ -163,10 +161,8 @@ describe('SignupForm', () => {
     );
 
     // Simulate user interaction and select parent level category
-    await user.selectOptions(
-      screen.getByRole('combobox'),
-      screen.getByRole('option', { name: 'Seller' })
-    );
+    // GMP: user type is picked from radio cards
+    await user.click(screen.getByRole('radio', { name: 'Seller' }));
 
     // Show user fields that have not been limited to type and have displayInSignUp: true
     expect(screen.getByText('Enum Field 1')).toBeInTheDocument();

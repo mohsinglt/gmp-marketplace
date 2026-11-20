@@ -254,3 +254,228 @@
 
 .confirmInfoText {
 }
+
+/* ================ Global Marketplace layout ================ */
+
+.gmpAuth {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: #f6f8fa;
+
+  @media (--viewportLarge) {
+    grid-template-columns: minmax(360px, 5fr) 7fr;
+    min-height: calc(100vh - 72px);
+  }
+}
+
+.gmpBrandPanel {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--gmpNavy);
+  color: var(--colorWhite);
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    background-color: #3d9a8b;
+    opacity: 0.14;
+    right: -200px;
+    bottom: -160px;
+  }
+
+  @media (--viewportLarge) {
+    display: block;
+  }
+}
+
+.gmpBrandInner {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+  margin-left: auto;
+  padding: 72px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.gmpBrandBadge {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 14px;
+  color: #d7e6f5;
+}
+
+.gmpBrandTitle {
+  margin: 0;
+  padding: 0;
+  font-family: var(--fontFamilyHeading);
+  font-size: 34px;
+  line-height: 1.18;
+  font-weight: 700;
+  color: var(--colorWhite);
+
+  @media (--viewportMedium) {
+    margin: 0;
+    padding: 0;
+    font-size: 34px;
+    line-height: 1.18;
+  }
+}
+
+.gmpBrandText {
+  margin: 0;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #c9d6e6;
+}
+
+.gmpBrandList {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #e6eef7;
+
+  & li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}
+
+.gmpBrandCheck {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background-color: var(--gmpTealLight);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--gmpNavy);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+}
+
+.gmpFormPanel {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 20px 64px;
+
+  @media (--viewportMedium) {
+    padding: 56px 32px 80px;
+  }
+
+  & .content {
+    width: 100%;
+    max-width: 520px;
+    margin: 0;
+    min-height: 0;
+    padding: 32px 24px;
+    border-radius: 20px;
+    background-color: var(--colorWhite);
+    border: 1px solid #e3e8ef;
+    box-shadow: 0 12px 32px rgba(19, 48, 94, 0.08);
+
+    @media (--viewportMedium) {
+      padding: 40px;
+      margin: 0;
+      min-height: 0;
+    }
+  }
+}
+
+/* User type cards */
+.userTypeCards {
+  border: 0;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.userTypeLegend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--colorGrey800);
+}
+
+.userTypeGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.userTypeCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 2px solid #e3e8ef;
+  background-color: var(--colorWhite);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #9cc7bf;
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px rgba(47, 127, 114, 0.25);
+  }
+}
+
+.userTypeCardSelected {
+  border-color: var(--gmpTeal);
+  background-color: #eef6f4;
+}
+
+.userTypeRadio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.userTypeTitle {
+  font-weight: var(--fontWeightSemiBold);
+  font-size: 15px;
+  line-height: 1.3;
+  color: var(--gmpNavy);
+}
+
+.userTypeText {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #5b6b80;
+}

@@ -9,6 +9,12 @@ import Field from '../../Field';
 import BlockBuilder from '../../BlockBuilder';
 
 import SectionContainer from '../SectionContainer';
+import {
+  facebookIcon as FacebookIcon,
+  instagramIcon as InstagramIcon,
+  linkedinIcon as LinkedinIcon,
+  youtubeIcon as YoutubeIcon,
+} from '../../Primitives/Link/Icons';
 import css from './SectionFooter.module.css';
 
 // The number of columns (numberOfColumns) affects styling
@@ -20,6 +26,16 @@ const GRID_CONFIG = [
   { contentCss: css.contentCol4, gridCss: css.gridCol4 },
 ];
 const MAX_MOBILE_SCREEN_WIDTH = 1024;
+
+// Global Marketplace: these social icons always show in the footer. When a link for a
+// platform is added in Console > Content > Footer, that link is used; until then the
+// icon shows without a link.
+const GMP_SOCIALS = [
+  { platform: 'facebook', name: 'Facebook', Icon: FacebookIcon },
+  { platform: 'instagram', name: 'Instagram', Icon: InstagramIcon },
+  { platform: 'linkedin', name: 'LinkedIn', Icon: LinkedinIcon },
+  { platform: 'youtube', name: 'YouTube', Icon: YoutubeIcon },
+];
 
 const getIndex = numberOfColumns => numberOfColumns - 1;
 
@@ -97,7 +113,9 @@ const SectionFooter = props => {
     };
   });
 
-  const showSocialMediaLinks = socialMediaLinks?.length > 0;
+  const configuredPlatforms = linksWithBlockId.map(l => l.link?.platform);
+  const placeholderSocials = GMP_SOCIALS.filter(s => !configuredPlatforms.includes(s.platform));
+  const showSocialMediaLinks = socialMediaLinks?.length > 0 || placeholderSocials.length > 0;
   const hasMatchMedia = typeof window !== 'undefined' && window?.matchMedia;
   const isMobileLayout = hasMatchMedia
     ? window.matchMedia(`(max-width: ${MAX_MOBILE_SCREEN_WIDTH}px)`)?.matches
@@ -136,6 +154,11 @@ const SectionFooter = props => {
             {showSocialMediaLinks ? (
               <div className={css.icons}>
                 <BlockBuilder blocks={linksWithBlockId} sectionId={sectionId} options={options} />
+                {placeholderSocials.map(({ platform, name, Icon }) => (
+                  <span key={platform} className={css.socialPlaceholder} title={name}>
+                    <Icon ariaLabel={name} />
+                  </span>
+                ))}
               </div>
             ) : null}
             <Field data={copyright} className={css.copyright} />

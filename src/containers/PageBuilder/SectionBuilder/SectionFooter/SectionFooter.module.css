@@ -222,3 +222,28 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Global Marketplace social icons (placeholders until links are added in Console) */
+.icons {
+  margin: 16px 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.socialPlaceholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--colorWhite);
+  border: 1px solid #e3e8ef;
+  color: var(--gmpNavy);
+
+  & svg path {
+    fill: currentColor;
+  }
+}

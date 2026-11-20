@@ -6,8 +6,6 @@ import { intlShape } from '../../util/reactIntl';
 import { propTypes } from '../../util/types';
 import * as validators from '../../util/validators';
 
-import { FieldSelect } from '../../components';
-
 import css from './AuthenticationPage.module.css';
 
 // Hidden input field
@@ -34,32 +32,50 @@ const FieldHidden = props => {
  * @returns {JSX.Element}
  */
 const FieldSelectUserType = props => {
-  const { rootClassName, className, name, userTypes, hasExistingUserType, intl } = props;
+  const { className, name, userTypes, hasExistingUserType, intl } = props;
   const hasMultipleUserTypes = userTypes?.length > 1;
-  const classes = classNames(rootClassName || css.userTypeSelect, className);
+
+  // Global Marketplace: user types are picked from three cards instead of a dropdown.
+  const requiredMessage = intl.formatMessage({ id: 'FieldSelectUserType.required' });
+  const describe = type => {
+    const id = `GmpAuth.userType.${type}`;
+    const text = intl.formatMessage({ id, defaultMessage: ' ' }).trim();
+    return text && text !== id ? text : null;
+  };
 
   return hasMultipleUserTypes && !hasExistingUserType ? (
-    <>
-      <FieldSelect
-        id={name}
-        name={name}
-        className={classes}
-        label={intl.formatMessage({ id: 'FieldSelectUserType.label' })}
-        validate={validators.required(intl.formatMessage({ id: 'FieldSelectUserType.required' }))}
-      >
-        <option disabled value="">
-          {intl.formatMessage({ id: 'FieldSelectUserType.placeholder' })}
-        </option>
+    <fieldset className={classNames(css.userTypeCards, className)}>
+      <legend className={css.userTypeLegend}>
+        {intl.formatMessage({ id: 'GmpAuth.joiningAs' })}
+      </legend>
+      <div className={css.userTypeGrid}>
         {userTypes.map(config => {
           const type = config.userType;
+          const description = describe(type);
           return (
-            <option key={type} value={type}>
-              {config.label}
-            </option>
+            <Field
+              key={type}
+              name={name}
+              type="radio"
+              value={type}
+              validate={validators.required(requiredMessage)}
+            >
+              {({ input }) => (
+                <label
+                  className={classNames(css.userTypeCard, {
+                    [css.userTypeCardSelected]: input.checked,
+                  })}
+                >
+                  <input {...input} id={`${name}-${type}`} className={css.userTypeRadio} />
+                  <span className={css.userTypeTitle}>{config.label}</span>
+                  {description ? <span className={css.userTypeText}>{description}</span> : null}
+                </label>
+              )}
+            </Field>
           );
         })}
-      </FieldSelect>
-    </>
+      </div>
+    </fieldset>
   ) : (
     <>
       <FieldHidden name={name} />

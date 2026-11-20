@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 import { useConfiguration } from '../../../context/configurationContext';
 import { useIntl, FormattedMessage } from '../../../util/reactIntl';
 
-import { Avatar, NamedLink } from '../../../components';
+import { NamedLink } from '../../../components';
 
 import {
   AGENCY_SEARCH,
@@ -37,8 +37,146 @@ const SectionHeader = ({ titleId, subtitleId, link }) => (
   </div>
 );
 
+// Cycles 0..count-1 every `ms`. Paused for people who prefer reduced motion.
+const useCycle = (count, ms) => {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (count < 2 || paused || typeof window === 'undefined') return undefined;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (reduce) return undefined;
+    const t = window.setInterval(() => setActive(i => (i + 1) % count), ms);
+    return () => window.clearInterval(t);
+  }, [count, ms, paused]);
+  return [active, setActive, setPaused];
+};
+
+// The highlighted words in the hero title rotate through "GmpHome.heroRotating" (separated by |).
+const RotatingWord = ({ words }) => {
+  const [active] = useCycle(words.length, 2800);
+  return (
+    <span className={css.rotator}>
+      {words.map((w, i) => (
+        <span
+          key={w}
+          className={classNames(css.heroAccent, css.rotatorWord, {
+            [css.rotatorWordActive]: i === active,
+          })}
+          aria-hidden={i !== active}
+        >
+          {w}
+        </span>
+      ))}
+    </span>
+  );
+};
+
+const AVATAR_COLOURS = ['#2F7F72', '#13305E', '#C2410C'];
+const initials = name =>
+  (name || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('');
+
+const STEP_ICONS = [
+  'M12 5v14M5 12h14',
+  'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4',
+  'M20 6 9 17l-5-5',
+];
+
+// Right side of the hero. Live agency cards when there are approved listings,
+// otherwise the three steps of how a match works. Cards take turns being highlighted.
+const HeroSide = ({ agencies }) => {
+  const cards = agencies.slice(0, 3);
+  const count = cards.length > 0 ? cards.length : 3;
+  const [active, setActive, setPaused] = useCycle(count, 3200);
+
+  const cardProps = i => ({
+    className: classNames(css.heroCard, {
+      [css.heroCardOffset]: i === 1,
+      [css.heroCardActive]: i === active,
+    }),
+    onMouseEnter: () => {
+      setPaused(true);
+      setActive(i);
+    },
+    onMouseLeave: () => setPaused(false),
+  });
+
+  return (
+    <div className={css.heroSide}>
+      <div className={css.heroSideLabel}>
+        <span className={css.liveDot} />
+        <FormattedMessage
+          id={cards.length > 0 ? 'GmpHome.heroSideAgencies' : 'GmpHome.heroSideSteps'}
+        />
+      </div>
+      {cards.length > 0
+        ? cards.map((a, i) => (
+            <NamedLink
+              key={a.id}
+              name="ListingPage"
+              params={{ id: a.id, slug: a.slug }}
+              {...cardProps(i)}
+            >
+              <span
+                className={css.heroInitials}
+                style={{ backgroundColor: AVATAR_COLOURS[i % AVATAR_COLOURS.length] }}
+              >
+                {initials(a.name)}
+              </span>
+              <div className={css.heroCardBody}>
+                <div className={css.heroCardName}>
+                  {a.name}
+                  <ShieldIcon className={css.tealIcon} size={16} />
+                </div>
+                <div className={css.heroCardServices}>{a.services.slice(0, 3).join(' · ')}</div>
+              </div>
+              {a.location ? <div className={css.heroCardLocation}>{a.location}</div> : null}
+            </NamedLink>
+          ))
+        : [1, 2, 3].map((n, i) => (
+            <div key={n} {...cardProps(i)}>
+              <span className={css.heroStepIcon}>
+                <Icon path={STEP_ICONS[i]} size={22} />
+              </span>
+              <div className={css.heroCardBody}>
+                <div className={css.heroCardName}>
+                  <FormattedMessage id={`GmpHome.heroStep${n}Title`} />
+                </div>
+                <div className={css.heroCardServices}>
+                  <FormattedMessage id={`GmpHome.heroStep${n}Text`} />
+                </div>
+              </div>
+              <div className={css.heroStepTag}>
+                <FormattedMessage id={`GmpHome.heroStep${n}Tag`} />
+              </div>
+            </div>
+          ))}
+      <div className={css.heroStats}>
+        {[1, 2, 3].map(n => (
+          <div key={n} className={css.heroStat}>
+            <strong>
+              <FormattedMessage id={`GmpHome.heroStat${n}Value`} />
+            </strong>
+            <span>
+              <FormattedMessage id={`GmpHome.heroStat${n}Label`} />
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Hero = ({ agencies, intl }) => {
-  const heroCards = agencies.slice(0, 3);
+  const rotating = intl
+    .formatMessage({ id: 'GmpHome.heroRotating' })
+    .split('|')
+    .map(w => w.trim())
+    .filter(Boolean);
   return (
     <section className={css.hero}>
       <div className={classNames(css.wrap, css.heroInner)}>
@@ -50,7 +188,14 @@ const Hero = ({ agencies, intl }) => {
           <h1 className={css.heroTitle}>
             <FormattedMessage
               id="GmpHome.heroTitle"
-              values={{ accent: text => <span className={css.heroAccent}>{text}</span> }}
+              values={{
+                accent: text =>
+                  rotating.length > 1 ? (
+                    <RotatingWord words={rotating} />
+                  ) : (
+                    <span className={css.heroAccent}>{text}</span>
+                  ),
+              }}
             />
           </h1>
           <p className={css.heroText}>
@@ -83,26 +228,7 @@ const Hero = ({ agencies, intl }) => {
             ))}
           </div>
         </div>
-        {heroCards.length > 0 ? (
-          <div className={css.heroSide} aria-hidden="true">
-            {heroCards.map((a, i) => (
-              <div
-                key={a.id}
-                className={classNames(css.heroCard, { [css.heroCardOffset]: i === 1 })}
-              >
-                <Avatar className={css.heroAvatar} user={a.author} disableProfileLink />
-                <div className={css.heroCardBody}>
-                  <div className={css.heroCardName}>
-                    {a.name}
-                    <ShieldIcon className={css.tealIcon} size={16} />
-                  </div>
-                  <div className={css.heroCardServices}>{a.services.slice(0, 3).join(' · ')}</div>
-                </div>
-                {a.location ? <div className={css.heroCardLocation}>{a.location}</div> : null}
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <HeroSide agencies={agencies} />
       </div>
     </section>
   );
