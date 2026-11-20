@@ -28,6 +28,8 @@ import SearchResultsPanel from './SearchResultsPanel/SearchResultsPanel';
 import NoSearchResultsMaybe from './NoSearchResultsMaybe/NoSearchResultsMaybe';
 import SearchPageAccessWrapper from './SearchPageAccessWrapper';
 import SearchErrors from './SearchErrors';
+import GmpFindTalent from '../GmpSearch/GmpFindTalent';
+import { AGENCY_LISTING_TYPE } from '../GmpPages/GmpCards';
 
 import css from './SearchPage.module.css';
 
@@ -206,6 +208,27 @@ export class SearchPageComponent extends Component {
       ? classNames(css.topbarBehindModal, css.topbar)
       : css.topbar;
 
+    // Global Marketplace: Find talent uses its own layout from the approved design.
+    if (listingTypePathParam === AGENCY_LISTING_TYPE) {
+      return (
+        <Page
+          scrollingDisabled={scrollingDisabled}
+          description={description}
+          title={title}
+          schema={schema}
+        >
+          <TopbarContainer currentSearchParams={validQueryParams} />
+          <GmpFindTalent
+            listings={this.props.agencyListings}
+            inProgress={this.props.agenciesInProgress}
+            location={location}
+            config={config}
+          />
+          <FooterContainer />
+        </Page>
+      );
+    }
+
     // N.B. openMobileMap button is sticky.
     // For some reason, stickyness doesn't work on Safari, if the element is <button>
     return (
@@ -350,6 +373,11 @@ const SearchPage = props => {
     selectListingsById(state, state.SearchPage.currentPageResultIds)
   );
   const scrollingDisabled = useSelector(state => isScrollingDisabled(state));
+  // Global Marketplace: all approved agencies, for the Find talent page
+  const agencyListings = useSelector(state =>
+    selectListingsById(state, state.LandingPage?.agencyIds || [])
+  );
+  const agenciesInProgress = useSelector(state => !!state.LandingPage?.agenciesInProgress);
 
   const onManageDisableScrolling = useCallback(
     (componentId, disableScrolling) =>
@@ -368,6 +396,8 @@ const SearchPage = props => {
       searchInProgress={searchInProgress}
       searchListingsError={searchListingsError}
       searchParams={searchParams}
+      agencyListings={agencyListings}
+      agenciesInProgress={agenciesInProgress}
       onManageDisableScrolling={onManageDisableScrolling}
     />
   );
