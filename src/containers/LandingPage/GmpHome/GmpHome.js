@@ -3,146 +3,23 @@ import classNames from 'classnames';
 
 import { useConfiguration } from '../../../context/configurationContext';
 import { useIntl, FormattedMessage } from '../../../util/reactIntl';
-import { createSlug } from '../../../util/urlHelpers';
 
 import { Avatar, NamedLink } from '../../../components';
 
+import {
+  AGENCY_SEARCH,
+  CATEGORIES,
+  Icon,
+  ShieldIcon,
+  serviceSearch,
+} from '../../GmpPages/gmpShared';
+import { AgencyCard, getServiceLabels, toAgency } from '../../GmpPages/GmpCards';
 import css from './GmpHome.module.css';
+
+export { AGENCY_SEARCH, CATEGORIES, Icon, ShieldIcon, serviceSearch };
 
 // Global Marketplace home page. Copy lives in src/translations/en.json under "GmpHome.*",
 // so it can be edited from Console > Marketplace texts without a code change.
-
-export const AGENCY_SEARCH = '/s/agency-services';
-export const serviceSearch = key => `${AGENCY_SEARCH}?pub_services=has_all%3A${key}`;
-
-// Order and icons for the ten service categories. Labels come from the hosted listing field
-// "services" when available, with these as fallbacks.
-export const CATEGORIES = [
-  { key: 'web_software_apps', label: 'Web & software', icon: 'M3 4h18v12H3zM8 20h8M12 16v4' },
-  {
-    key: 'ai_automation',
-    label: 'AI & automation',
-    icon: 'M5 8h14v11H5zM12 4v4M9 13h.01M15 13h.01M9 16h6',
-  },
-  { key: 'data_analytics', label: 'Data & analytics', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
-  {
-    key: 'cloud_devops',
-    label: 'Cloud & DevOps',
-    icon: 'M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12 3.5 3.5 0 0 0 6 19h11.5z',
-  },
-  { key: 'digital_marketing', label: 'Marketing & SEO', icon: 'm3 17 6-6 4 4 8-8M15 7h6v6' },
-  {
-    key: 'accounting',
-    label: 'Accounting',
-    icon: 'M6 2h12v20l-3-2-3 2-3-2-3 2V2zM9 7h6M9 11h6M9 15h3',
-  },
-  {
-    key: 'design_video',
-    label: 'Design & video',
-    icon: 'M12 22a10 10 0 1 1 10-10M13.5 6.5h.01M6.5 12.5h.01M17.5 15.5h.01',
-  },
-  { key: 'architecture', label: 'Architecture', icon: 'M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6' },
-  {
-    key: 'ecommerce',
-    label: 'E-commerce',
-    icon: 'M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6',
-  },
-  {
-    key: 'remote_staffing',
-    label: 'Remote staffing',
-    icon: 'M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M19 8v6M16 11h6',
-  },
-];
-
-export const COUNTRY_LABELS = {
-  pakistan: 'Pakistan',
-  india: 'India',
-  united_kingdom: 'United Kingdom',
-  united_states: 'United States',
-  canada: 'Canada',
-};
-
-export const Icon = ({ path, className, size = 22 }) => (
-  <svg
-    className={className}
-    aria-hidden="true"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d={path} fill="none" />
-  </svg>
-);
-
-export const ShieldIcon = ({ className, size = 15 }) => (
-  <svg className={className} aria-hidden="true" width={size} height={size} viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12 2 4 5v7c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V5l-8-3z" />
-    <path
-      d="m8.5 12 2.3 2.3L15.5 9.6"
-      stroke="#fff"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const PinIcon = () => (
-  <svg
-    aria-hidden="true"
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-  >
-    <path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z" />
-    <circle cx="12" cy="10" r="2.5" />
-  </svg>
-);
-
-// Turn a listing entity into what the cards need.
-const toAgency = (listing, serviceLabels) => {
-  const { title = '', description = '', publicData = {} } = listing.attributes || {};
-  const author = listing.author;
-  const authorPublic = author?.attributes?.profile?.publicData || {};
-  const name = author?.attributes?.profile?.displayName || title.split(':')[0];
-  const city = authorPublic.city;
-  const country = COUNTRY_LABELS[authorPublic.country];
-  const location = [city, country].filter(Boolean).join(', ');
-  const services = (publicData.services || []).map(k => serviceLabels[k] || k);
-  const tagline = description.length > 120 ? `${description.slice(0, 117).trim()}…` : description;
-  const years = publicData.years_operating;
-  const team = publicData.team_size;
-  return {
-    id: listing.id.uuid,
-    slug: createSlug(title || name),
-    name,
-    author,
-    location,
-    services,
-    tagline,
-    years,
-    team,
-  };
-};
-
-const AgencyMeta = ({ agency }) => {
-  if (agency.years) {
-    return <FormattedMessage id="GmpHome.agencyYears" values={{ years: agency.years }} />;
-  }
-  if (agency.team) {
-    return <FormattedMessage id="GmpHome.agencyTeam" values={{ team: agency.team }} />;
-  }
-  return null;
-};
 
 const SectionHeader = ({ titleId, subtitleId, link }) => (
   <div className={css.sectionHeader}>
@@ -301,55 +178,9 @@ const FeaturedAgencies = ({ agencies }) => (
       </div>
     ) : (
       <div className={css.agencyGrid}>
-        {agencies.slice(0, 6).map(a => {
-          const chips =
-            a.services.length > 3
-              ? [...a.services.slice(0, 3), `+${a.services.length - 3}`]
-              : a.services;
-          return (
-            <article key={a.id} className={css.agencyCard}>
-              <div className={css.agencyHead}>
-                <Avatar className={css.agencyAvatar} user={a.author} disableProfileLink />
-                <div className={css.agencyHeadText}>
-                  <h3 className={css.agencyName}>{a.name}</h3>
-                  {a.location ? (
-                    <div className={css.agencyLocation}>
-                      <PinIcon />
-                      {a.location}
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-              <p className={css.agencyTagline}>{a.tagline}</p>
-              <div className={css.chips}>
-                {chips.map(ch => (
-                  <span key={ch} className={css.chip}>
-                    {ch}
-                  </span>
-                ))}
-              </div>
-              <div className={css.agencyFoot}>
-                <span className={css.vetted}>
-                  <ShieldIcon className={css.tealIcon} />
-                  <FormattedMessage id="GmpHome.vetted" />
-                  {a.years || a.team ? (
-                    <>
-                      {' · '}
-                      <AgencyMeta agency={a} />
-                    </>
-                  ) : null}
-                </span>
-                <NamedLink
-                  name="ListingPage"
-                  params={{ id: a.id, slug: a.slug }}
-                  className={css.agencyLink}
-                >
-                  <FormattedMessage id="GmpHome.viewProfile" />
-                </NamedLink>
-              </div>
-            </article>
-          );
-        })}
+        {agencies.slice(0, 6).map(a => (
+          <AgencyCard key={a.id} agency={a} />
+        ))}
       </div>
     )}
   </section>
@@ -514,14 +345,7 @@ const GmpHome = props => {
   const intl = useIntl();
   const config = useConfiguration();
 
-  // Short category labels read better on chips than the long hosted option labels;
-  // unknown options fall back to the hosted label from the "services" listing field.
-  const servicesField = (config?.listing?.listingFields || []).find(f => f.key === 'services');
-  const hostedLabels = (servicesField?.enumOptions || []).reduce(
-    (acc, o) => ({ ...acc, [o.option]: o.label }),
-    {}
-  );
-  const serviceLabels = CATEGORIES.reduce((acc, c) => ({ ...acc, [c.key]: c.label }), hostedLabels);
+  const serviceLabels = getServiceLabels(config);
   const categoryLabels = {};
 
   const listings = agencyListings.filter(l => l?.attributes && !l.attributes.deleted);

@@ -5,7 +5,7 @@ import { FormattedMessage } from '../../util/reactIntl';
 
 import { Avatar, NamedLink } from '../../components';
 
-import { Icon } from '../LandingPage/GmpHome/GmpHome';
+import { Icon } from './gmpShared';
 import base from '../LandingPage/GmpHome/GmpHome.module.css';
 import GmpLayout from './GmpLayout';
 import css from './GmpPages.module.css';

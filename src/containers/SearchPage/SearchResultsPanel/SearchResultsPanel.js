@@ -1,10 +1,24 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import { useConfiguration } from '../../../context/configurationContext';
 import { propTypes } from '../../../util/types';
 import { ListingCard, PaginationLinks } from '../../../components';
 
+import {
+  AGENCY_LISTING_TYPE,
+  PROJECT_LISTING_TYPE,
+  AgencyCard,
+  ProjectCard,
+  getServiceLabels,
+  toAgency,
+} from '../../GmpPages/GmpCards';
+import gmpCss from '../../GmpPages/GmpCards.module.css';
+
 import css from './SearchResultsPanel.module.css';
+
+const listingTypeOf = l => l?.attributes?.publicData?.listingType;
+const isGmpCardType = l => [AGENCY_LISTING_TYPE, PROJECT_LISTING_TYPE].includes(listingTypeOf(l));
 
 /**
  * SearchResultsPanel component
@@ -32,7 +46,11 @@ const SearchResultsPanel = props => {
     listingTypeParam,
     intl,
   } = props;
+  const config = useConfiguration();
   const classes = classNames(rootClassName || css.root, className);
+  // Global Marketplace: agencies and project requests use text-first cards in a wider grid.
+  const useGmpCards = listings.length > 0 && listings.every(isGmpCardType);
+  const serviceLabels = useGmpCards ? getServiceLabels(config) : {};
   const pageName = listingTypeParam ? 'SearchPageWithListingType' : 'SearchPage';
 
   const paginationLinks =
@@ -74,19 +92,34 @@ const SearchResultsPanel = props => {
 
   return (
     <div className={classes}>
-      <ul className={isMapVariant ? css.listingCardsMapVariant : css.listingCards}>
-        {listings.map(l => (
-          <li key={l.id.uuid} className={css.resultItem}>
-            <ListingCard
-              className={css.listingCard}
-              listing={l}
-              renderSizes={cardRenderSizes(isMapVariant)}
-              setActiveListing={setActiveListing}
-            />
-          </li>
-        ))}
-        {props.children}
-      </ul>
+      {useGmpCards ? (
+        <ul className={gmpCss.gmpCards}>
+          {listings.map(l => (
+            <li key={l.id.uuid} className={gmpCss.gmpCardItem}>
+              {listingTypeOf(l) === AGENCY_LISTING_TYPE ? (
+                <AgencyCard agency={toAgency(l, serviceLabels)} />
+              ) : (
+                <ProjectCard listing={l} config={config} />
+              )}
+            </li>
+          ))}
+          {props.children}
+        </ul>
+      ) : (
+        <ul className={isMapVariant ? css.listingCardsMapVariant : css.listingCards}>
+          {listings.map(l => (
+            <li key={l.id.uuid} className={css.resultItem}>
+              <ListingCard
+                className={css.listingCard}
+                listing={l}
+                renderSizes={cardRenderSizes(isMapVariant)}
+                setActiveListing={setActiveListing}
+              />
+            </li>
+          ))}
+          {props.children}
+        </ul>
+      )}
       {paginationLinks}
     </div>
   );

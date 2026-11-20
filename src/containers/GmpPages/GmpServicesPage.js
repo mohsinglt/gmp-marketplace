@@ -5,7 +5,7 @@ import { useIntl, FormattedMessage } from '../../util/reactIntl';
 
 import { NamedLink } from '../../components';
 
-import { CATEGORIES, Icon, serviceSearch } from '../LandingPage/GmpHome/GmpHome';
+import { CATEGORIES, Icon, serviceSearch } from './gmpShared';
 import base from '../LandingPage/GmpHome/GmpHome.module.css';
 import GmpLayout from './GmpLayout';
 import css from './GmpPages.module.css';
