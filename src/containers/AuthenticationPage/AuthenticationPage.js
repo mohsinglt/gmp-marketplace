@@ -24,6 +24,7 @@ import {
   Page,
   Heading,
   IconSpinner,
+  NamedLink,
   NamedRedirect,
   LinkTabNavHorizontal,
   Modal,
@@ -49,6 +50,7 @@ import TermsAndConditions from './TermsAndConditions/TermsAndConditions';
 import ConfirmSignupForm from './ConfirmSignupForm/ConfirmSignupForm';
 import LoginForm from './LoginForm/LoginForm';
 import SignupForm from './SignupForm/SignupForm';
+import { GmpSignupHeader, GmpSignupPanel, SIGNUP_STEPS } from './GmpSignup';
 import EmailVerificationInfo from './EmailVerificationInfo';
 import SocialLoginButtons from './SocialLoginButtons/SocialLoginButtons';
 
@@ -197,6 +199,8 @@ export const AuthenticationPageComponent = props => {
   const [authInfo, setAuthInfo] = useState(getAuthInfoFromCookies());
   const [authError, setAuthError] = useState(getAuthErrorFromCookies());
   const [mounted, setMounted] = useState(false);
+  // Global Marketplace: current step of the stepped sign-up form
+  const [signupStep, setSignupStep] = useState(0);
 
   const config = useConfiguration();
   const intl = useIntl();
@@ -256,6 +260,14 @@ export const AuthenticationPageComponent = props => {
   const { userTypes = [], userFields = [] } = config.user;
   const preselectedUserType = userTypes.find(conf => conf.userType === userType)?.userType || null;
   const signupRouteName = !!preselectedUserType ? 'SignupForUserTypePage' : 'SignupPage';
+  // Global Marketplace: /signup opens the Business form; the switch above the form changes type
+  const gmpSignupType =
+    preselectedUserType ||
+    (userTypes.find(conf => conf.userType === 'business') ? 'business' : null);
+  const gmpSteps = gmpSignupType ? SIGNUP_STEPS[gmpSignupType] : null;
+  useEffect(() => {
+    setSignupStep(0);
+  }, [gmpSignupType, tab]);
   const userTypeMaybe = preselectedUserType ? { userType: preselectedUserType } : {};
   const fromMaybe = from ? { from } : {};
   const fromState = { state: { ...fromMaybe, ...userTypeMaybe } };
@@ -346,41 +358,54 @@ export const AuthenticationPageComponent = props => {
         footer={<FooterContainer />}
       >
         {/* Global Marketplace: split layout (brand panel + form) instead of a background image */}
-        <section className={css.gmpAuth}>
-          <aside className={css.gmpBrandPanel} aria-hidden="true">
-            <div className={css.gmpBrandInner}>
-              <span className={css.gmpBrandBadge}>
-                <FormattedMessage id="GmpAuth.badge" />
-              </span>
-              <h2 className={css.gmpBrandTitle}>
-                <FormattedMessage id={isLogin ? 'GmpAuth.loginTitle' : 'GmpAuth.signupTitle'} />
-              </h2>
-              <p className={css.gmpBrandText}>
-                <FormattedMessage id={isLogin ? 'GmpAuth.loginText' : 'GmpAuth.signupText'} />
-              </p>
-              <ul className={css.gmpBrandList}>
-                {[1, 2, 3].map(n => (
-                  <li key={n}>
-                    <span className={css.gmpBrandCheck} />
-                    <FormattedMessage id={`GmpAuth.point${n}`} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+        <section className={!isLogin && gmpSignupType ? css.gmpAuthSignup : css.gmpAuth}>
+          {isLogin || !gmpSignupType || isConfirm ? (
+            <aside className={css.gmpBrandPanel} aria-hidden="true">
+              <div className={css.gmpBrandInner}>
+                <span className={css.gmpBrandBadge}>
+                  <FormattedMessage id="GmpAuth.badge" />
+                </span>
+                <h2 className={css.gmpBrandTitle}>
+                  <FormattedMessage id={isLogin ? 'GmpAuth.loginTitle' : 'GmpAuth.signupTitle'} />
+                </h2>
+                <p className={css.gmpBrandText}>
+                  <FormattedMessage id={isLogin ? 'GmpAuth.loginText' : 'GmpAuth.signupText'} />
+                </p>
+                <ul className={css.gmpBrandList}>
+                  {[1, 2, 3].map(n => (
+                    <li key={n}>
+                      <span className={css.gmpBrandCheck} />
+                      <FormattedMessage id={`GmpAuth.point${n}`} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          ) : (
+            <GmpSignupPanel userType={gmpSignupType} step={signupStep} />
+          )}
           <div className={css.gmpFormPanel}>
             {showAuthenticationForm ? (
               <div className={css.content}>
-                <LinkTabNavHorizontal
-                  className={css.tabs}
-                  tabs={getAuthenticationTabs({
-                    isLogin,
-                    signupRouteName,
-                    userTypeMaybe,
-                    fromState,
-                  })}
-                  ariaLabel={`${signupLinkText} & ${loginLinkText}`}
-                />
+                {isLogin || !gmpSignupType ? (
+                  <LinkTabNavHorizontal
+                    className={css.tabs}
+                    tabs={getAuthenticationTabs({
+                      isLogin,
+                      signupRouteName,
+                      userTypeMaybe,
+                      fromState,
+                    })}
+                    ariaLabel={`${signupLinkText} & ${loginLinkText}`}
+                  />
+                ) : (
+                  <GmpSignupHeader
+                    userType={gmpSignupType}
+                    availableTypes={userTypes.map(t => t.userType)}
+                    step={signupStep}
+                    fromState={fromMaybe.from ? { from } : null}
+                  />
+                )}
 
                 <AuthenticationFormErrorMessage
                   isLogin={isLogin}
@@ -397,6 +422,7 @@ export const AuthenticationPageComponent = props => {
                   />
                 ) : (
                   <SignupForm
+                    key={gmpSignupType || 'signup'}
                     className={css.signupForm}
                     onSubmit={getHandleSubmitSignup({
                       submitSignup,
@@ -405,11 +431,23 @@ export const AuthenticationPageComponent = props => {
                     })}
                     inProgress={authInProgress}
                     termsAndConditions={termsAndConditions}
-                    preselectedUserType={preselectedUserType}
+                    preselectedUserType={gmpSignupType || preselectedUserType}
                     userTypes={userTypes}
                     userFields={userFields}
+                    steps={gmpSteps}
+                    step={signupStep}
+                    onStepChange={setSignupStep}
                   />
                 )}
+
+                {!isLogin && gmpSignupType ? (
+                  <p className={css.gmpLoginLink}>
+                    <FormattedMessage id="GmpSignup.haveAccount" />{' '}
+                    <NamedLink name="LoginPage" to={fromState}>
+                      <FormattedMessage id="GmpSignup.logIn" />
+                    </NamedLink>
+                  </p>
+                ) : null}
 
                 <SocialLoginButtons
                   isLogin={isLogin}

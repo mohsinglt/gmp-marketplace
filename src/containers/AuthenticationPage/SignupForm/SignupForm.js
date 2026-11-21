@@ -30,6 +30,24 @@ const isPasswordUsedMoreThanOnce = formValues => {
   return false;
 };
 
+// Global Marketplace: the sign-up form can be split into steps. `steps` lists, per step, the
+// custom user field keys shown there (step 0 always holds the account fields). Fields not
+// listed go on the last step. "Continue" only moves on when the current step is valid.
+const stepOfField = (steps, key) => {
+  if (!steps) return 0;
+  const i = steps.findIndex(keys => keys.includes(key));
+  return i >= 0 ? i : steps.length - 1;
+};
+const ACCOUNT_FIELD_NAMES = [
+  'email',
+  'fname',
+  'lname',
+  'password',
+  'displayName',
+  'phoneNumber',
+  'terms',
+];
+
 const SignupFormComponent = props => (
   <FinalForm
     {...props}
@@ -49,7 +67,14 @@ const SignupFormComponent = props => (
         userTypes,
         userFields,
         values,
+        form,
+        steps,
+        step = 0,
+        onStepChange,
       } = formRenderProps;
+      const stepCount = steps ? steps.length : 1;
+      const currentStep = Math.min(step, stepCount - 1);
+      const isLastStep = currentStep === stepCount - 1;
 
       const { userType } = values || {};
 
@@ -109,12 +134,41 @@ const SignupFormComponent = props => (
       const showDefaultUserFields = userType || noUserTypes;
       const showCustomUserFields = (userType || noUserTypes) && userFieldProps?.length > 0;
 
+      const stepFieldNames = i =>
+        (i === 0 ? ACCOUNT_FIELD_NAMES : []).concat(
+          (userFieldProps || [])
+            .filter(f => stepOfField(steps, f.fieldConfig?.key) === i)
+            .map(f => f.name)
+        );
+      const goToNextStep = () => {
+        const errors = form.getState().errors || {};
+        const invalidNames = stepFieldNames(currentStep).filter(n => errors[n]);
+        if (invalidNames.length > 0) {
+          invalidNames.forEach(n => {
+            form.focus(n);
+            form.blur(n);
+          });
+          return;
+        }
+        onStepChange(currentStep + 1);
+        if (typeof window !== 'undefined') window.scrollTo(0, 0);
+      };
+      const goToPreviousStep = () => onStepChange(Math.max(currentStep - 1, 0));
+      const onFormSubmit = e => {
+        if (isLastStep) {
+          return handleSubmit(e);
+        }
+        e.preventDefault();
+        goToNextStep();
+      };
+      const hiddenUnless = i => (currentStep === i ? null : css.stepHidden);
+
       const classes = classNames(rootClassName || css.root, className);
       const submitInProgress = inProgress;
       const submitDisabled = invalid || submitInProgress || isPasswordUsedMoreThanOnce(values);
 
       return (
-        <Form className={classes} onSubmit={handleSubmit}>
+        <Form className={classes} onSubmit={onFormSubmit}>
           <FieldSelectUserType
             name="userType"
             userTypes={userTypes}
@@ -123,7 +177,7 @@ const SignupFormComponent = props => (
           />
 
           {showDefaultUserFields ? (
-            <div className={css.defaultUserFields}>
+            <div className={classNames(css.defaultUserFields, hiddenUnless(0))}>
               <FieldTextInput
                 type="email"
                 id={formId ? `${formId}.email` : 'email'}
@@ -210,21 +264,43 @@ const SignupFormComponent = props => (
           {showCustomUserFields ? (
             <div className={css.customFields}>
               {userFieldProps.map(({ key, ...fieldProps }) => (
-                <CustomExtendedDataField key={key} {...fieldProps} formId={formId} />
+                <div
+                  key={key}
+                  className={hiddenUnless(stepOfField(steps, fieldProps.fieldConfig?.key))}
+                >
+                  <CustomExtendedDataField {...fieldProps} formId={formId} />
+                </div>
               ))}
             </div>
           ) : null}
 
           <div className={css.bottomWrapper}>
-            {termsAndConditions}
+            <div className={hiddenUnless(0)}>{termsAndConditions}</div>
             {isPasswordUsedMoreThanOnce(values) ? (
               <div className={css.error}>
                 <FormattedMessage id="SignupForm.passwordRepeatedOnOtherFields" />
               </div>
             ) : null}
-            <PrimaryButton type="submit" inProgress={submitInProgress} disabled={submitDisabled}>
-              <FormattedMessage id="SignupForm.signUp" />
-            </PrimaryButton>
+            <div className={steps ? css.stepButtons : null}>
+              {steps && currentStep > 0 ? (
+                <button type="button" className={css.backButton} onClick={goToPreviousStep}>
+                  <FormattedMessage id="GmpSignup.back" />
+                </button>
+              ) : null}
+              {isLastStep ? (
+                <PrimaryButton
+                  type="submit"
+                  inProgress={submitInProgress}
+                  disabled={submitDisabled}
+                >
+                  <FormattedMessage id="SignupForm.signUp" />
+                </PrimaryButton>
+              ) : (
+                <PrimaryButton type="button" onClick={goToNextStep}>
+                  <FormattedMessage id="GmpSignup.continue" />
+                </PrimaryButton>
+              )}
+            </div>
           </div>
         </Form>
       );
@@ -245,6 +321,9 @@ const SignupFormComponent = props => (
  * @param {string} props.preselectedUserType - The preselected user type
  * @param {propTypes.userTypes} props.userTypes - The user types
  * @param {propTypes.listingFields} props.userFields - The user fields
+ * @param {Array<Array<string>>} [props.steps] - Optional: custom user field keys per step
+ * @param {number} [props.step] - Optional: current step index
+ * @param {Function} [props.onStepChange] - Optional: called with the next step index
  * @returns {JSX.Element}
  */
 const SignupForm = props => {

@@ -26,9 +26,71 @@
 .row,
 .customFields {
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 
   @media (--viewportMedium) {
-    margin-top: 32px;
+    margin-top: 24px;
+  }
+
+  & > div > * {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  /* Global Marketplace: multi-select options (e.g. services) as pills, as in the prototype */
+  & fieldset ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    columns: auto;
+  }
+
+  & fieldset li {
+    margin: 0;
+    padding: 0;
+  }
+
+  & fieldset li label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1.5px solid #c9d6e6;
+    border-radius: 999px;
+    background-color: var(--colorWhite);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      border-color: var(--gmpTeal);
+    }
+
+    & > span:first-child {
+      display: none;
+    }
+
+    & > span:last-child {
+      font-size: 14px;
+      font-weight: 500;
+      color: #3d4b5e;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  & fieldset li input:checked + label {
+    border-color: var(--gmpTeal);
+    background-color: #e6f4f1;
+
+    & > span:last-child {
+      color: var(--gmpNavy);
+    }
+  }
+
+  & fieldset li input:focus-visible + label {
+    box-shadow: 0 0 0 3px rgba(47, 127, 114, 0.25);
   }
 }
 
@@ -57,5 +119,36 @@
 
   @media (--viewportMedium) {
     padding: 8px 0;
+  }
+}
+
+/* Global Marketplace: stepped sign-up */
+.stepHidden {
+  display: none;
+}
+
+.stepButtons {
+  display: flex;
+  gap: 12px;
+
+  & > button:last-child {
+    flex: 1;
+  }
+}
+
+.backButton {
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 1.5px solid #c9d6e6;
+  border-radius: 12px;
+  background-color: var(--colorWhite);
+  color: #1f2a3c;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--gmpNavy);
   }
 }

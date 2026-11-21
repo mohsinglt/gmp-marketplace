@@ -479,3 +479,308 @@
   line-height: 1.4;
   color: #5b6b80;
 }
+
+/* ================ Global Marketplace: stepped sign-up (prototype) ================ */
+
+.gmpAuthSignup {
+  composes: gmpAuth;
+
+  & .content {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    max-width: 600px;
+
+    @media (--viewportMedium) {
+      padding: 0;
+    }
+  }
+}
+
+.gmpBrandPanelTeal {
+  composes: gmpBrandPanel;
+  background-color: var(--gmpTeal);
+
+  &::after {
+    background-color: var(--gmpNavy);
+    opacity: 0.18;
+  }
+
+  & .gmpBrandText,
+  & .gmpRailText {
+    color: #e1f2ee;
+  }
+
+  & .gmpRailDotActive {
+    background-color: var(--colorWhite);
+    color: var(--gmpTeal);
+  }
+
+  & .gmpRailItemCurrent {
+    background-color: rgba(255, 255, 255, 0.14);
+  }
+
+  & .gmpPanelFoot,
+  & .gmpPanelLink {
+    color: #e1f2ee;
+  }
+}
+
+.gmpBrandHead {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gmpPerks {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gmpPerk {
+  display: flex;
+  gap: 14px;
+}
+
+.gmpPerkIcon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--gmpTealLight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gmpPerkTitle {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--colorWhite);
+}
+
+.gmpPerkText {
+  display: block;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #c9d6e6;
+}
+
+.gmpRail {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gmpRailItem {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.gmpRailItemCurrent {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.gmpRailDot {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fontFamilyHeading);
+  font-weight: 600;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: var(--colorWhite);
+}
+
+.gmpRailDotActive {
+  background-color: var(--gmpTealLight);
+  color: var(--gmpNavy);
+}
+
+.gmpRailTitle {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--colorWhite);
+}
+
+.gmpRailText {
+  display: block;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #a9bbd1;
+}
+
+.gmpPanelFoot {
+  margin: 24px 0 0;
+  padding: 0;
+  font-size: 14px;
+  color: #a9bbd1;
+}
+
+.gmpPanelLink {
+  color: var(--gmpTealLight);
+  text-decoration: underline;
+}
+
+.gmpSignupHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.gmpTypeSwitch {
+  align-self: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 12px;
+  background-color: #eef3f8;
+}
+
+.gmpTypeTab {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  color: #5b6b80;
+
+  &:hover {
+    color: var(--gmpNavy);
+    text-decoration: none;
+  }
+}
+
+.gmpTypeTabActive {
+  composes: gmpTypeTab;
+  background-color: var(--colorWhite);
+  color: var(--gmpNavy);
+  box-shadow: 0 2px 8px rgba(19, 48, 94, 0.12);
+}
+
+.gmpStepInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gmpStepCount {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gmpTeal);
+}
+
+.gmpProgress {
+  height: 6px;
+  border-radius: 999px;
+  background-color: #e3e8ef;
+  overflow: hidden;
+}
+
+.gmpProgressBar {
+  height: 6px;
+  border-radius: 999px;
+  background-color: var(--gmpTeal);
+  transition: width 0.25s ease;
+}
+
+.gmpStepTitle {
+  margin: 6px 0 0;
+  padding: 0;
+  font-family: var(--fontFamilyHeading);
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--gmpNavy);
+
+  @media (--viewportMedium) {
+    margin: 6px 0 0;
+    padding: 0;
+    font-size: 30px;
+    line-height: 1.25;
+  }
+}
+
+.gmpStepText {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #5b6b80;
+}
+
+.gmpLoginLink {
+  margin: 20px 0 0;
+  padding: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #5b6b80;
+
+  & a {
+    font-weight: 600;
+    color: var(--gmpTeal);
+  }
+}
+
+/* Form inputs in the prototype style */
+.gmpFormPanel {
+  & input[type='text'],
+  & input[type='email'],
+  & input[type='password'],
+  & input[type='number'],
+  & input[type='tel'],
+  & input[type='url'],
+  & select,
+  & textarea {
+    border: 1.5px solid #c9d6e6;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+    background-color: var(--colorWhite);
+    box-shadow: none;
+
+    &:hover {
+      border-color: #9cb3cc;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--gmpTeal);
+      box-shadow: 0 0 0 3px rgba(47, 127, 114, 0.18);
+    }
+  }
+
+  & label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2a3c;
+  }
+
+  & button[type='submit'],
+  & button[type='button'] {
+    border-radius: 12px;
+  }
+}
