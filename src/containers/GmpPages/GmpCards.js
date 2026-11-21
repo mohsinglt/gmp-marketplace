@@ -15,7 +15,7 @@ export const PROJECT_LISTING_TYPE = 'project-request';
 const truncate = (text = '', max) =>
   text.length > max ? `${text.slice(0, max - 3).trim()}…` : text;
 
-const enumLabel = (config, fieldKey, value) => {
+export const enumLabel = (config, fieldKey, value) => {
   const field = (config?.listing?.listingFields || []).find(f => f.key === fieldKey);
   return (field?.enumOptions || []).find(o => o.option === value)?.label || value;
 };

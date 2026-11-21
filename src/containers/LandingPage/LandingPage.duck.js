@@ -46,6 +46,35 @@ const fetchHomeAgenciesPayloadCreator = async (_, thunkAPI) => {
     });
 };
 
+// Global Marketplace: all open project requests, for the Browse projects page.
+export const PROJECT_LISTING_TYPE = 'project-request';
+
+const fetchOpenProjectsPayloadCreator = async (_, thunkAPI) => {
+  const { extra: sdk, rejectWithValue, dispatch } = thunkAPI;
+  return sdk.listings
+    .query({
+      pub_listingType: PROJECT_LISTING_TYPE,
+      perPage: AGENCY_QUERY_PER_PAGE,
+      page: 1,
+      include: ['author'],
+      'fields.listing': ['title', 'description', 'publicData', 'state', 'deleted', 'createdAt'],
+      'fields.user': ['profile.displayName', 'profile.abbreviatedName', 'profile.publicData'],
+    })
+    .then(response => {
+      dispatch(addMarketplaceEntities(response));
+      return { listingIds: response.data.data.map(l => l.id) };
+    })
+    .catch(error => {
+      log.error(error, 'open-projects-fetch-failed', {}, { skipSentry: isForbiddenError(error) });
+      return rejectWithValue(storableError(error));
+    });
+};
+
+export const fetchOpenProjects = createAsyncThunk(
+  'LandingPage/fetchOpenProjects',
+  fetchOpenProjectsPayloadCreator
+);
+
 export const fetchHomeAgencies = createAsyncThunk(
   'LandingPage/fetchHomeAgencies',
   fetchHomeAgenciesPayloadCreator
@@ -57,6 +86,9 @@ const initialState = {
   agencyIds: [],
   agenciesInProgress: false,
   agenciesError: null,
+  projectIds: [],
+  projectsInProgress: false,
+  projectsError: null,
 };
 
 const landingPageSlice = createSlice({
@@ -76,6 +108,18 @@ const landingPageSlice = createSlice({
       .addCase(fetchHomeAgencies.rejected, (state, action) => {
         state.agenciesInProgress = false;
         state.agenciesError = action.payload;
+      })
+      .addCase(fetchOpenProjects.pending, state => {
+        state.projectsInProgress = true;
+        state.projectsError = null;
+      })
+      .addCase(fetchOpenProjects.fulfilled, (state, action) => {
+        state.projectsInProgress = false;
+        state.projectIds = action.payload.listingIds;
+      })
+      .addCase(fetchOpenProjects.rejected, (state, action) => {
+        state.projectsInProgress = false;
+        state.projectsError = action.payload;
       });
   },
 });

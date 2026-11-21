@@ -16,7 +16,12 @@ import { parse } from '../../util/urlHelpers';
 import { getReferralParams } from '../../util/webStorageHelpers';
 
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
-import { AGENCY_LISTING_TYPE, fetchHomeAgencies } from '../LandingPage/LandingPage.duck';
+import {
+  AGENCY_LISTING_TYPE,
+  PROJECT_LISTING_TYPE,
+  fetchHomeAgencies,
+  fetchOpenProjects,
+} from '../LandingPage/LandingPage.duck';
 
 // Pagination page size might need to be dynamic on responsive page layouts
 // Current design has max 3 columns 12 is divisible by 2 and 3
@@ -413,7 +418,7 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
   });
 
   // Global Marketplace: "based_in" is filtered on the page from the agency's profile
-  const { page = 1, address, origin, based_in, ...rest } = queryParams;
+  const { page = 1, address, origin, based_in, client_in, ...rest } = queryParams;
   const originMaybe = isOriginInUse(config) && origin ? { origin } : {};
 
   const listingTypeVariantMaybe = listingTypePathParam
@@ -430,6 +435,10 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
   // Global Marketplace: Find talent filters all approved agencies on the page
   if (listingTypePathParam === AGENCY_LISTING_TYPE) {
     dispatch(fetchHomeAgencies());
+  }
+  // Global Marketplace: Browse projects filters all open projects on the page
+  if (listingTypePathParam === PROJECT_LISTING_TYPE) {
+    dispatch(fetchOpenProjects());
   }
 
   const searchListingsCall = searchListings({

@@ -29,7 +29,8 @@ import NoSearchResultsMaybe from './NoSearchResultsMaybe/NoSearchResultsMaybe';
 import SearchPageAccessWrapper from './SearchPageAccessWrapper';
 import SearchErrors from './SearchErrors';
 import GmpFindTalent from '../GmpSearch/GmpFindTalent';
-import { AGENCY_LISTING_TYPE } from '../GmpPages/GmpCards';
+import GmpBrowseProjects from '../GmpSearch/GmpBrowseProjects';
+import { AGENCY_LISTING_TYPE, PROJECT_LISTING_TYPE } from '../GmpPages/GmpCards';
 
 import css from './SearchPage.module.css';
 
@@ -229,6 +230,28 @@ export class SearchPageComponent extends Component {
       );
     }
 
+    // Global Marketplace: Browse projects, same design, only for approved providers
+    if (listingTypePathParam === PROJECT_LISTING_TYPE) {
+      return (
+        <Page
+          scrollingDisabled={scrollingDisabled}
+          description={description}
+          title={title}
+          schema={schema}
+        >
+          <TopbarContainer currentSearchParams={validQueryParams} />
+          <GmpBrowseProjects
+            listings={this.props.projectListings}
+            inProgress={this.props.projectsInProgress}
+            currentUser={currentUser}
+            location={location}
+            config={config}
+          />
+          <FooterContainer />
+        </Page>
+      );
+    }
+
     // N.B. openMobileMap button is sticky.
     // For some reason, stickyness doesn't work on Safari, if the element is <button>
     return (
@@ -378,6 +401,11 @@ const SearchPage = props => {
     selectListingsById(state, state.LandingPage?.agencyIds || [])
   );
   const agenciesInProgress = useSelector(state => !!state.LandingPage?.agenciesInProgress);
+  // Global Marketplace: all open projects, for Browse projects
+  const projectListings = useSelector(state =>
+    selectListingsById(state, state.LandingPage?.projectIds || [])
+  );
+  const projectsInProgress = useSelector(state => !!state.LandingPage?.projectsInProgress);
 
   const onManageDisableScrolling = useCallback(
     (componentId, disableScrolling) =>
@@ -398,6 +426,8 @@ const SearchPage = props => {
       searchParams={searchParams}
       agencyListings={agencyListings}
       agenciesInProgress={agenciesInProgress}
+      projectListings={projectListings}
+      projectsInProgress={projectsInProgress}
       onManageDisableScrolling={onManageDisableScrolling}
     />
   );
